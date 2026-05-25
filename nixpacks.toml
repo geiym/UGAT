@@ -1,2 +1,5 @@
 [phases.setup]
-aptPkgs = ["php8.4-mysql"]
+aptPkgs = ["php8.4-mysql", "php8.4-pdo-mysql"]
+
+[phases.build]
+cmds = ["php -m | grep -i mysql"]
