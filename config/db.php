@@ -1,21 +1,22 @@
 <?php
-// Force the app to get variables from Railway.
-// If any of these are empty, we want to know immediately.
-$host = getenv('MYSQLHOST');
-$user = getenv('MYSQLUSER');
-$pass = getenv('MYSQLPASSWORD');
-$db   = getenv('MYSQLDATABASE');
-$port = getenv('MYSQLPORT');
+define('DB_HOST', $_ENV['MYSQLHOST']     ?? 'localhost');
+define('DB_USER', $_ENV['MYSQLUSER']     ?? 'root');
+define('DB_PASS', $_ENV['MYSQLPASSWORD'] ?? '');
+define('DB_NAME', $_ENV['MYSQLDATABASE'] ?? 'ugat_db');
+define('DB_PORT', (int)($_ENV['MYSQLPORT'] ?? 3306));
 
-// Debugging: If it fails, this will show exactly which variable is missing
-if (!$host || !$user || !$pass || !$db) {
-    die(json_encode(['success' => false, 'message' => "DB Config Missing: Host:$host, User:$user, DB:$db"]));
+if (!extension_loaded('mysqli')) {
+    error_log('mysqli not loaded. Loaded extensions: ' . implode(', ', get_loaded_extensions()));
+    http_response_code(500);
+    die(json_encode(['success' => false, 'message' => 'mysqli not available. Extensions: ' . implode(', ', get_loaded_extensions())]));
 }
 
-$conn = new mysqli($host, $user, $pass, $db, (int)$port);
+$conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_PORT);
 
 if ($conn->connect_error) {
-    die(json_encode(['success' => false, 'message' => 'Connection failed: ' . $conn->connect_error]));
+    error_log('DB connection failed: ' . $conn->connect_error);
+    http_response_code(500);
+    die(json_encode(['success' => false, 'message' => 'Database connection error.']));
 }
 
 $conn->set_charset('utf8mb4');
