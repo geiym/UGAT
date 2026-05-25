@@ -1,25 +1,23 @@
 <?php
-// ============================================================
-//   config/db.php  —  Dynamic Database Connection (MySQLi)
-// ============================================================
-
-// getenv() reads directly from system environment memory securely.
-// If they don't exist, it safely defaults to your local setup!
-define('DB_HOST', getenv('MYSQLHOST')     ?: 'localhost');
-define('DB_USER', getenv('MYSQLUSER')     ?: 'root');          
-define('DB_PASS', getenv('MYSQLPASSWORD') ?: '');              
-define('DB_NAME', getenv('MYSQLDATABASE') ?: 'ugat_db');
-define('DB_PORT', getenv('MYSQLPORT')     ?: 3306);
+// Use a more explicit approach to capture environment variables
+$host = getenv('MYSQLHOST') ?: 'localhost';
+$user = getenv('MYSQLUSER') ?: 'root';
+$pass = getenv('MYSQLPASSWORD') ?: '';
+$db   = getenv('MYSQLDATABASE') ?: 'ugat_db';
+$port = (int)(getenv('MYSQLPORT') ?: 3306);
 
 // Create connection
-$conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME, (int)DB_PORT);
+$conn = new mysqli($host, $user, $pass, $db, $port);
 
 // Check connection
 if ($conn->connect_error) {
-    // In production, log this and show a generic error page
+    // DEVELOPMENT DEBUG: Uncomment the line below to see the error on your screen
+    // die("Connection failed: " . $conn->connect_error); 
+    
+    // PRODUCTION: Keep this for the live site
     error_log('DB connection failed: ' . $conn->connect_error);
     http_response_code(500);
-    die(json_encode(['success' => false, 'message' => 'Database connection error.']));
+    die(json_encode(['success' => false, 'message' => 'Database connection error. Check your environment variables.']));
 }
 
 // Force UTF-8
