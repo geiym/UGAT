@@ -1,25 +1,22 @@
 <?php
-// Use a more explicit approach to capture environment variables
-$host = getenv('MYSQLHOST') ?: 'localhost';
-$user = getenv('MYSQLUSER') ?: 'root';
-$pass = getenv('MYSQLPASSWORD') ?: '';
-$db   = getenv('MYSQLDATABASE') ?: 'ugat_db';
-$port = (int)(getenv('MYSQLPORT') ?: 3306);
+// Force the app to get variables from Railway.
+// If any of these are empty, we want to know immediately.
+$host = getenv('MYSQLHOST');
+$user = getenv('MYSQLUSER');
+$pass = getenv('MYSQLPASSWORD');
+$db   = getenv('MYSQLDATABASE');
+$port = getenv('MYSQLPORT');
 
-// Create connection
-$conn = new mysqli($host, $user, $pass, $db, $port);
-
-// Check connection
-if ($conn->connect_error) {
-    // DEVELOPMENT DEBUG: Uncomment the line below to see the error on your screen
-    // die("Connection failed: " . $conn->connect_error); 
-    
-    // PRODUCTION: Keep this for the live site
-    error_log('DB connection failed: ' . $conn->connect_error);
-    http_response_code(500);
-    die(json_encode(['success' => false, 'message' => 'Database connection error. Check your environment variables.']));
+// Debugging: If it fails, this will show exactly which variable is missing
+if (!$host || !$user || !$pass || !$db) {
+    die(json_encode(['success' => false, 'message' => "DB Config Missing: Host:$host, User:$user, DB:$db"]));
 }
 
-// Force UTF-8
+$conn = new mysqli($host, $user, $pass, $db, (int)$port);
+
+if ($conn->connect_error) {
+    die(json_encode(['success' => false, 'message' => 'Connection failed: ' . $conn->connect_error]));
+}
+
 $conn->set_charset('utf8mb4');
 ?>
