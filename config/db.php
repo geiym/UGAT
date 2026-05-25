@@ -12,9 +12,8 @@ try {
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
     ]);
 } catch (PDOException $e) {
-    error_log('DB connection failed: ' . $e->getMessage());
     http_response_code(500);
-    die(json_encode(['success' => false, 'message' => 'Database connection error.']));
+    die(json_encode(['success' => false, 'message' => $e->getMessage(), 'host' => $host, 'db' => $db, 'port' => $port]));
 }
 
 // Compatibility wrapper so all your $conn->query() calls still work
