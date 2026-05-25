@@ -1,0 +1,8 @@
+{
+    "name": "ugat/ugat",
+    "require": {
+        "php": ">=8.0",
+        "ext-mysqli": "*",
+        "ext-pdo_mysql": "*"
+    }
+}
